@@ -1,0 +1,18 @@
+{
+  "n_models": 9,
+  "n_resolutions": 4,
+  "friedman_statistic": 27.80000000000001,
+  "friedman_pvalue": 0.0005138099822151687,
+  "critical_difference": 6.006997169967703,
+  "average_ranks": {
+    "ResidualLSTM (Proposed)": 1.5,
+    "LSTM": 2.5,
+    "GRU": 2.75,
+    "BiLSTM": 4.0,
+    "RNN": 4.5,
+    "PatchTST": 6.5,
+    "CNN1D": 6.5,
+    "Naive Persistence": 8.25,
+    "Chronos-Bolt (zero-shot)": 8.5
+  }
+}

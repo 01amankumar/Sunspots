@@ -1,0 +1,513 @@
+<title>Hemispheric Predictability Review</title>
+<style>
+  :root {
+    --bg-page: #eef1ef; --bg-surface: #ffffff; --bg-band: #101c2c;
+    --ink-1: #0f1614; --ink-2: #454f4c; --ink-muted: #7c8884;
+    --accent-gold: #a3690a; --accent-navy: #1f3a5f;
+    --border: rgba(15,22,20,0.13); --border-soft: rgba(15,22,20,0.08);
+    --tier1: #1f5a3a; --tier1-bg: rgba(31,90,58,0.10);
+    --tier4: #a13333; --tier4-bg: rgba(161,51,51,0.09);
+    --tier-mid: #8a6a1a; --tier-mid-bg: rgba(163,105,10,0.09);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg-page: #0c1110; --bg-surface: #151b1a; --bg-band: #0a1420;
+      --ink-1: #eef1ef; --ink-2: #b9c2be; --ink-muted: #83908c;
+      --accent-gold: #e0a83a; --accent-navy: #7ea6da;
+      --border: rgba(238,241,239,0.14); --border-soft: rgba(238,241,239,0.08);
+      --tier1: #7fd6ab; --tier1-bg: rgba(90,200,150,0.12);
+      --tier4: #e08080; --tier4-bg: rgba(224,128,128,0.12);
+      --tier-mid: #e0c05a; --tier-mid-bg: rgba(224,192,90,0.10);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg-page: #0c1110; --bg-surface: #151b1a; --bg-band: #0a1420;
+    --ink-1: #eef1ef; --ink-2: #b9c2be; --ink-muted: #83908c;
+    --accent-gold: #e0a83a; --accent-navy: #7ea6da;
+    --border: rgba(238,241,239,0.14); --border-soft: rgba(238,241,239,0.08);
+    --tier1: #7fd6ab; --tier1-bg: rgba(90,200,150,0.12);
+    --tier4: #e08080; --tier4-bg: rgba(224,128,128,0.12);
+    --tier-mid: #e0c05a; --tier-mid-bg: rgba(224,192,90,0.10);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg-page); color: var(--ink-1); font-family: system-ui,-apple-system,"Segoe UI",sans-serif; line-height: 1.6; }
+  .band { background: var(--bg-band); color: #eef1ef; padding: 2.4rem 1.5rem 2rem; }
+  .band-inner { max-width: 1180px; margin: 0 auto; }
+  .eyebrow { font-family: ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: #9db3cc; margin: 0 0 .6rem; }
+  h1 { font-family: ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace; font-size: clamp(1.4rem,2.8vw,2rem); font-weight: 600; letter-spacing: -.01em; margin: 0 0 .55rem; text-wrap: balance; }
+  .band p.lede { color: #cbd6e2; font-size: .98rem; max-width: 76ch; margin: 0; }
+
+  .layout { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 230px 1fr; gap: 2.2rem; padding: 2rem 1.5rem 5rem; align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .toc { position: static !important; } }
+
+  .toc { position: sticky; top: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.1rem; font-size: .82rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  .toc-title { font-family: ui-monospace, monospace; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); margin: 0 0 .6rem; }
+  .toc a { display: block; color: var(--ink-2); text-decoration: none; padding: .22rem 0; border-left: 2px solid transparent; padding-left: .6rem; margin-left: -.6rem; }
+  .toc a:hover { color: var(--accent-navy); border-left-color: var(--accent-navy); }
+
+  main { min-width: 0; }
+  section { margin-top: 2.6rem; scroll-margin-top: 1.5rem; }
+  section:first-of-type { margin-top: 0; }
+  .part-label { font-family: ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-navy); margin: 0 0 .7rem; display: flex; align-items: center; gap: .6rem; }
+  .part-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  h2 { font-size: 1.24rem; font-weight: 650; margin: 0 0 .6rem; text-wrap: balance; }
+  h3 { font-size: 1.02rem; font-weight: 650; margin: 1.3rem 0 .5rem; }
+  p.sub { color: var(--ink-2); font-size: .93rem; margin: 0 0 1rem; max-width: 76ch; }
+  p { max-width: 76ch; }
+
+  .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.3rem; }
+  .card + .card { margin-top: 1rem; }
+
+  .table-scroll { overflow-x: auto; margin: 1rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .82rem; min-width: 640px; }
+  th, td { text-align: left; padding: .5rem .65rem; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+  th { color: var(--ink-muted); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; background: var(--bg-surface); position: sticky; top: 0; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .tag { display: inline-block; font-size: .72rem; font-weight: 700; padding: .15rem .55rem; border-radius: 999px; white-space: nowrap; }
+  .tag.tier1 { background: var(--tier1-bg); color: var(--tier1); }
+  .tag.tier4 { background: var(--tier4-bg); color: var(--tier4); }
+  .tag.tiermid { background: var(--tier-mid-bg); color: var(--tier-mid); }
+
+  .gap-card { border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.3rem; background: var(--bg-surface); margin-top: 1rem; }
+  .gap-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
+  .gap-head h4 { margin: 0; font-size: 1rem; font-weight: 700; }
+  .stars { font-family: ui-monospace, monospace; color: var(--accent-gold); font-size: .95rem; white-space: nowrap; }
+  .gap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem 1.5rem; font-size: .86rem; margin-top: .5rem; }
+  @media (max-width: 700px) { .gap-grid { grid-template-columns: 1fr; } }
+  .gap-grid dt { font-weight: 650; color: var(--ink-1); margin-top: .5rem; }
+  .gap-grid dd { margin: .1rem 0 0; color: var(--ink-2); }
+
+  .callout { border: 1px solid var(--border); border-left: 3px solid var(--accent-navy); background: var(--bg-surface); border-radius: 0 8px 8px 0; padding: .9rem 1.1rem; font-size: .9rem; color: var(--ink-2); margin: 1rem 0; }
+  .callout.warn { border-left-color: var(--accent-gold); }
+  .callout.reject { border-left-color: var(--tier4); }
+  .callout b { color: var(--ink-1); }
+
+  code { font-family: ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace; font-size: .85em; background: var(--border-soft); padding: .1em .4em; border-radius: 4px; }
+
+  ul.fix-list, ol.fix-list { margin: 0; padding-left: 1.2rem; }
+  ul.fix-list li, ol.fix-list li { margin-bottom: .55rem; font-size: .92rem; color: var(--ink-2); }
+  ul.fix-list li b, ol.fix-list li b { color: var(--ink-1); }
+
+  .qa { border: 1px solid var(--border); border-radius: 8px; padding: .9rem 1.1rem; margin-bottom: .8rem; background: var(--bg-surface); }
+  .qa .q { font-weight: 700; color: var(--ink-1); font-size: .9rem; margin-bottom: .35rem; }
+  .qa .a { font-size: .88rem; color: var(--ink-2); }
+
+  .claim-box { border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+  .claim-box .label { font-family: ui-monospace, monospace; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--accent-navy); margin-bottom: .5rem; }
+  .claim-box p { font-size: .95rem; font-style: italic; color: var(--ink-1); margin: 0; }
+
+  footer { margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--border); font-size: .8rem; color: var(--ink-muted); }
+</style>
+
+<div class="band">
+  <div class="band-inner">
+    <p class="eyebrow">Peer-review-style novelty audit &middot; hemispheric sunspot forecasting &middot; 1874&ndash;2025</p>
+    <h1>Where hemispheric solar-cycle forecasting is genuinely open, and where it isn't</h1>
+    <p class="lede">A literature-grounded audit of your Cycle 26 forecasting work, run as a hostile reviewer would run it: search first, reject what's already published, and recommend only what survives.</p>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="toc">
+    <p class="toc-title">Contents</p>
+    <a href="#method">How this was done</a>
+    <a href="#parta">A &middot; Novelty matrix</a>
+    <a href="#partb">B &middot; Top 10 gaps</a>
+    <a href="#partc">C &middot; Top 5 ideas</a>
+    <a href="#partd">D &middot; Your ideas A&ndash;J, scored</a>
+    <a href="#parte">E &middot; Recommendation</a>
+    <a href="#partf">F &middot; Experimental design</a>
+    <a href="#partg">G &middot; Hypotheses</a>
+    <a href="#parth">H &middot; Title options</a>
+    <a href="#parti">I &middot; Contribution statement</a>
+    <a href="#partj">J &middot; Reviewer objections</a>
+    <a href="#partk">K &middot; Rebuttals</a>
+    <a href="#partl">L &middot; Do-not-claim list</a>
+  </nav>
+
+  <main>
+
+    <section id="method">
+      <div class="part-label">Method</div>
+      <h2>How this audit was actually done</h2>
+      <p class="sub">This ran as ~10 targeted web searches plus direct fetches of abstract/data pages, not from memory. Every paper below came back from an actual search result. Coverage is honest, not exhaustive: some entries rest on search-snippet summaries rather than full text (Solar Physics/ApJ/MNRAS are mostly paywalled), and I could not reach 20&ndash;30 papers with the depth the brief asked for in one pass &mdash; I'd rather hand you 19 real, checkable entries than pad to 30 with guesses. Where I'm not sure, I say so.</p>
+      <div class="callout">
+        <b>One finding changes the whole picture up front:</b> your own 2025 Solar Physics paper (Kumar &amp; Kumar, "Hybrid-Ensemble Deep-Learning Models...") is itself part of the prior-art set the next paper has to clear &mdash; and the field around hemispheric Cycle 25/26 prediction is far more crowded than the recursive-forecast work assumed. The good news: the search also surfaced one question nobody has actually asked yet.
+      </div>
+    </section>
+
+    <section id="parta">
+      <div class="part-label">Part A</div>
+      <h2>Literature novelty matrix</h2>
+      <p class="sub">19 directly relevant works, newest first within topic clusters. "Hemisphere?" and "Uncertainty?" are the two columns that matter most for your specific gap.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Paper</th><th>Year</th><th>Dataset</th><th>Target</th><th>Hemisphere?</th><th>Horizon</th><th>Method</th><th>Cycles</th><th>Uncertainty?</th><th>Contribution</th><th>Limitation / not done</th></tr></thead>
+          <tbody>
+            <tr><td>Chen et al., "Improved Prediction of Solar Cycles 25&amp;26 Using the Informer Model" <em>(ApJ 969, 120)</em></td><td class="num">2024</td><td>SILSO whole-disk 1749&ndash;2023; hemispheric 1992&ndash;2023 (380 mo.)</td><td>Point forecast (peak, timing)</td><td>Yes</td><td>Multi-year direct</td><td>Informer (transformer)</td><td>25, 26</td><td class="num">No</td><td>Transformer long-horizon + Gnevyshev peaks + N-S asymmetry in one model</td><td>Short hemispheric record (32 yr); <b>no horizon-vs-skill curve; no hemisphere predictability comparison</b> (explicitly not done); point estimates only; authors call for physics integration</td></tr>
+            <tr><td>Ruiz et al. (implied), "Hemispheric Sunspot Number Prediction for Solar Cycles 25 and 26 Using Spectral Analysis and ML" <em>(Solar Physics 299, 116)</em></td><td class="num">2024</td><td>Likely SILSO hemispheric (short record &mdash; unconfirmed exact span)</td><td>Point forecast to Jan 2038</td><td>Yes</td><td>Multi-year direct</td><td>Spectral analysis + ML</td><td>25, 26</td><td class="num">Partial (RMSE reported)</td><td>N 51.5 (Nov 2033), S 70.1 (Nov 2034); S&gt;N prevalence continuing since ~1980</td><td>RMSE without full predictive-interval treatment; data span not independently confirmed by me</td></tr>
+            <tr><td>Kumar &amp; Kumar, "Hybrid-Ensemble Deep-Learning Models..." <em>(Solar Physics 300, 100)</em> &mdash; <b>your own 2025 paper</b></td><td class="num">2025</td><td>SILSO total SSN: 13-mo smoothed, yearly, monthly mean</td><td>1-step-ahead point forecast</td><td>No</td><td>1-step</td><td>CNN-DilatedLSTM-BiLSTM-GRU concatenation ensembles</td><td>&mdash; (backtest only)</td><td class="num">No</td><td>RMSE 4.06 (smoothed) beats single traditional models</td><td>No hemispheric split; no long-horizon; no uncertainty; the baseline this follow-up must differentiate from</td></tr>
+            <tr><td>Javaraiah, "North-south asymmetry in solar activity: predicting the amplitude of the next solar cycle" <em>(MNRAS-L 377, L34)</em></td><td class="num">2007</td><td>Sunspot group data (era-appropriate)</td><td>Next-cycle amplitude (scalar)</td><td>Yes (as asymmetry index)</td><td>1 cycle ahead</td><td>Statistical regression</td><td>~19&ndash;23</td><td class="num">No</td><td>Established N-S asymmetry as an amplitude precursor &mdash; origin of a 5-paper series</td><td>Cycle-level scalar only, not a time-series/DL model</td></tr>
+            <tr><td>Javaraiah, Paper II, improved Cycle 24 prediction</td><td class="num">~2009</td><td>Sunspot group data</td><td>Amplitude (scalar)</td><td>Yes</td><td>1 cycle ahead</td><td>Statistical regression</td><td>24</td><td class="num">No</td><td>Refines Paper I's method</td><td>Same as above</td></tr>
+            <tr><td>Javaraiah, Paper III <em>(Solar Physics)</em></td><td class="num">2014</td><td>Greenwich + SOON, 1874&ndash;2013</td><td>Cycle 25 amplitude (scalar)</td><td>Yes</td><td>1 cycle ahead</td><td>Statistical regression</td><td>25</td><td class="num">No</td><td>First to reach back to 1874 for this precursor method</td><td>Still scalar/cycle-level, not monthly time series; not DL</td></tr>
+            <tr><td>Javaraiah, Paper IV, "Prediction for Lengths of Upcoming Solar Cycles" <em>(Solar Physics)</em></td><td class="num">2019</td><td>GPR 1874&ndash;1976 + DPD 1977&ndash;2017</td><td>Cycle length (scalar)</td><td>Yes</td><td>Multi-cycle ahead</td><td>Statistical regression</td><td>12&ndash;24</td><td class="num">No</td><td>Predicts cycle <em>duration</em>, not just amplitude</td><td>Scalar; no monthly trajectory; no DL</td></tr>
+            <tr><td>Javaraiah, Paper V, "Prediction for the N-S Asymmetry in the Amplitude of Solar Cycle 25" <em>(Ap&amp;SS)</em></td><td class="num">2021</td><td>GPR+DPD+ISSN v2, 1874&ndash;2017</td><td>N-S asymmetry index (scalar)</td><td>Yes &mdash; explicitly the target</td><td>1 cycle ahead</td><td>Statistical regression</td><td>25 (from 12&ndash;24)</td><td class="num">No</td><td>Predicts the asymmetry itself, not just each hemisphere separately</td><td>Still scalar per-cycle, not a forecast trajectory; not DL</td></tr>
+            <tr><td>Veronig, Jain, Podladchikova, Poetzi, Clette, "Hemispheric sunspot numbers 1874&ndash;2020" <em>(A&amp;A 652, A56)</em></td><td class="num">2021</td><td>Greenwich + Kanzelh&ouml;he/Skalnat&eacute; Pleso + SILSO, spliced</td><td>N/A &mdash; data reconstruction, not a forecast</td><td>Yes &mdash; the whole point</td><td>N/A</td><td>Cross-calibration / splicing</td><td>12&ndash;24 covered</td><td class="num">N/A</td><td><b>The 151-year record this whole line of work depends on</b>; a 2026 review calls it "underutilized" in prediction studies</td><td>Not a prediction paper at all &mdash; explains why so few forecasting papers use the long record</td></tr>
+            <tr><td>Bizzarri et al., "Forecasting solar cycle 25 using a multistep Bayesian neural network" <em>(MNRAS 515, 5062)</em></td><td class="num">2022</td><td>SILSO total SSN (not stated as hemispheric)</td><td>Full cycle profile</td><td>No</td><td>Multi-step</td><td>Bayesian LSTM</td><td>25</td><td class="num"><b>Yes &mdash; rigorous</b></td><td>Cycle 25 duration 10.6&plusmn;0.7 yr; train/test + k-fold CV cross-checked</td><td><b>Total SSN only, not hemispheric</b> &mdash; the uncertainty-methodology precedent this work would need to extend, not invent</td></tr>
+            <tr><td>"Phase lags of solar hemispheric cycles" <em>(arXiv:1309.2114)</em></td><td class="num">2013</td><td>Historical hemispheric records</td><td>Characterizes N-S phase lag (not a forecast)</td><td>Yes &mdash; core topic</td><td>N/A (descriptive)</td><td>Time-series/statistical analysis</td><td>Multiple historical</td><td class="num">N/A</td><td>Establishes phase-lag as a real, measurable phenomenon</td><td>Descriptive, not predictive; doesn't forecast future lag</td></tr>
+            <tr><td>"Is hemispheric asymmetry solely governed by polar flux imbalance in the previous cycle?" <em>(arXiv:1906.06877)</em></td><td class="num">2019</td><td>Polar flux + hemispheric SSN</td><td>Physical mechanism test</td><td>Yes</td><td>N/A</td><td>Physics / correlation analysis</td><td>Multiple</td><td class="num">N/A</td><td>Tests a specific physical driver of asymmetry</td><td>Not a forecasting model; mechanistic, not predictive</td></tr>
+            <tr><td>"Predictability of the Solar Cycle Over One Cycle" <em>(ApJ, iopscience/aad197)</em></td><td class="num">~2018</td><td>Total SSN / flux-transport model state</td><td>Forecast-skill vs. cycle phase</td><td>No</td><td>Within-cycle</td><td>Physics-based (flux transport), not ML</td><td>Not hemisphere-specific</td><td class="num">Implicit (ensemble spread)</td><td>Establishes that predictability is <em>phase-dependent</em> for the total signal</td><td>Not hemispheric; not empirical/ML-based; the phase-dependence precedent this work would extend</td></tr>
+            <tr><td>Variational data assimilation forecast, cycles 22&ndash;25 <em>(A&amp;A, 2025)</em></td><td class="num">2025</td><td>Total SSN, physics-based state estimation</td><td>Full-cycle shape</td><td>No</td><td>Multi-year</td><td>Data assimilation (physics)</td><td>22&ndash;25</td><td class="num">Implicit</td><td>Shows relative error grows through decline phase, small near max</td><td>Physics-based, not ML; not hemispheric</td></tr>
+            <tr><td>Low-dimensional chaos / Lyapunov exponent studies (multiple: sunspot areas, group numbers)</td><td class="num">2007&ndash;2014</td><td>Total SSN and sunspot area, long records</td><td>Theoretical predictability limit</td><td>No</td><td>N/A (theoretical, ~1.3&ndash;16 mo. implied)</td><td>Nonlinear dynamics / Lyapunov exponent estimation</td><td>N/A</td><td class="num">N/A</td><td><b>Chaos-theoretic predictability horizon exists in the literature (~16 months)</b> for the total signal</td><td>Never computed per-hemisphere; never connected to empirical ML forecast-skill decay &mdash; <b>this exact bridge is missing</b></td></tr>
+            <tr><td>"Prediction of solar cycles 26 and 27 based on LSTM-FCN" <em>(ScienceDirect)</em></td><td class="num">2025</td><td>Likely total SSN (title doesn't indicate hemispheric)</td><td>Point forecast</td><td>Unconfirmed &mdash; likely No</td><td>Multi-cycle</td><td>LSTM-FCN</td><td>26, 27</td><td class="num">Unconfirmed</td><td>Extends prediction two cycles out</td><td>Not independently verified beyond title/abstract snippet</td></tr>
+            <tr><td>"Hemispheric prediction of solar cycle 25 based on a deep learning technique" <em>(ScienceDirect)</em></td><td class="num">2023</td><td>Likely SILSO hemispheric (short)</td><td>Point forecast</td><td>Yes</td><td>Multi-year</td><td>Deep learning (unspecified in snippet)</td><td>25 only</td><td class="num">Unconfirmed</td><td>Another hemispheric DL entry pre-dating Chen et al. 2024</td><td>Cycle 25 only, not 26; short record</td></tr>
+            <tr><td>"Long-term Variations in Solar Activity: Predictions for Amplitude and N-S Asymmetry of Cycle 25" <em>(arXiv:2202.13838)</em></td><td class="num">2022</td><td>Long-term (span not independently confirmed)</td><td>Amplitude + asymmetry (scalar)</td><td>Yes</td><td>1 cycle</td><td>Statistical</td><td>25</td><td class="num">Unconfirmed</td><td>Another scalar precursor-style N-S study</td><td>Likely same limitation class as the Javaraiah series</td></tr>
+            <tr><td>N-BEATS / NHITS sunspot forecasting (Pramana journal, "Synergistic sunspot forecasting")</td><td class="num">2024&ndash;25</td><td>Total SSN, "&gt;8 cycles"</td><td>Point forecast, Cycle 25</td><td>No</td><td>Multi-year</td><td>N-BEATS, statistical fusion</td><td>25</td><td class="num">Unconfirmed</td><td>Applies modern interpretable DL forecasting architectures to sunspots</td><td>Not hemispheric; not clearly validated at long horizon</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sub">Not included as full rows, but load-bearing for the gap analysis: the 2026 review "Solar Cycle Prediction: Challenges, Progress, and Future Perspectives" (arXiv:2604.16183), which explicitly states hemispheric prediction is under-explored relative to global prediction, deep learning for this problem is still "emerging," uncertainty quantification is broadly missing, and the Veronig et al. long record is "referenced... but not widely adopted."</p>
+    </section>
+
+    <section id="partb">
+      <div class="part-label">Part B</div>
+      <h2>Top 10 research gaps</h2>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>1. Hemisphere-specific empirical predictability (forecast-skill decay vs. horizon)</h4><span class="stars">★★★★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>Chen et al. 2024 predicts both hemispheres but reports only point estimates, no skill-vs-horizon curve. Phase-dependent predictability (ApJ aad197) exists only for the total signal, physics-based not ML.</dd>
+          <dt>What's been done</dt><dd>Hemisphere amplitude/timing asymmetry: extensively (Javaraiah I&ndash;V, Chen et al.). Total-signal predictability-vs-phase: yes, physics-based.</dd>
+          <dt>What's missing</dt><dd>Nobody has computed and statistically compared <em>forecast-skill decay curves</em> (RMSE/R&sup2; vs. horizon) separately for N and S, empirically, with ML, using a long record.</dd>
+          <dt>Why it matters</dt><dd>If the hemispheres are differently predictable, that's new evidence about asymmetric dynamo behavior &mdash; independent of whether any specific Cycle 26 number is later confirmed right or wrong.</dd>
+          <dt>Can your dataset address it?</dt><dd>Yes &mdash; the 151-year splice is exactly what's needed for stable long-horizon backtesting per hemisphere.</dd>
+          <dt>Can your current model address it?</dt><dd>Mostly yes &mdash; you already have validated direct-horizon ResidualLSTM and the failed-recursive backtest as a methodological control.</dd>
+          <dt>Additional experiment required</dt><dd>Horizon-stepped backtests (1, 3, 6, 12, 24, 36, 60, 120, 157 mo.) per hemisphere, with a formal statistical test (e.g. Diebold-Mariano or bootstrap) for N vs. S skill difference at each horizon.</dd>
+          <dt>Expected publication strength</dt><dd>Strong for Solar Physics / Space Weather if the difference is real and statistically supported either way (a null result is still publishable here).</dd>
+          <dt>Risk level</dt><dd>Moderate &mdash; result could be "no significant difference," which is still a valid, publishable finding but less exciting.</dd>
+          <dt>Genuinely new?</dt><dd>Yes, based on this search. The pieces (hemispheric DL, predictability-vs-phase) exist separately; the combination doesn't appear to.</dd>
+        </dl>
+      </div>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>2. Bridging empirical ML predictability to theoretical chaos limits, per hemisphere</h4><span class="stars">★★★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>Lyapunov-exponent studies give a ~16-month theoretical predictability horizon for the <em>total</em> signal (multiple papers, 2007&ndash;2014).</dd>
+          <dt>What's been done</dt><dd>Chaos/Lyapunov estimation for total SSN and sunspot area.</dd>
+          <dt>What's missing</dt><dd>No Lyapunov/chaos estimate has been computed separately for N and S; no paper connects an empirical ML predictability horizon to the theoretical chaos-based one.</dd>
+          <dt>Why it matters</dt><dd>Would test whether one hemisphere is "more chaotic" than the other &mdash; a genuinely physical question, not just a modeling exercise.</dd>
+          <dt>Can your dataset address it?</dt><dd>Yes, same 151-year hemispheric series supports a per-hemisphere Lyapunov estimate (e.g. Wolf/Rosenstein algorithm).</dd>
+          <dt>Can your current model address it?</dt><dd>Partially &mdash; the ML predictability-horizon half is covered by Gap 1; the Lyapunov half needs a separate (well-established, off-the-shelf) nonlinear-dynamics computation.</dd>
+          <dt>Additional experiment</dt><dd>Compute largest Lyapunov exponent per hemisphere; compare to the empirical ML skill-decay horizon from Gap 1.</dd>
+          <dt>Expected strength</dt><dd>Strong if combined with Gap 1 as one paper; weak alone (a Lyapunov-exponent-only paper without the ML component is a much thinner contribution).</dd>
+          <dt>Risk</dt><dd>Chaos-metric estimates on this kind of noisy real-world series are sensitive to method choice &mdash; needs care and probably a sensitivity check across estimators.</dd>
+          <dt>Genuinely new?</dt><dd>Yes as a hemisphere-resolved, ML-connected analysis; the underlying chaos-estimation technique itself is old (not novel on its own).</dd>
+        </dl>
+      </div>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>3. Rigorous recursive-vs-direct forecasting comparison as a methodological study</h4><span class="stars">★★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>General time-series ML literature has this debate (exposure bias, DeepAR, seq2seq direct-multi-output work), but I found no solar-physics paper that runs and reports both failure and success modes side by side for sunspot data.</dd>
+          <dt>What's been done</dt><dd>Most solar-cycle DL papers report only their chosen method's result, not a documented negative control.</dd>
+          <dt>What's missing</dt><dd>A solar-physics-specific, quantitative demonstration (which you already have, informally) of recursive collapse vs. direct-horizon stability.</dd>
+          <dt>Why it matters</dt><dd>Prevents the field from repeating the recursive-forecast mistake; useful as a cautionary methodological reference.</dd>
+          <dt>Can your dataset/model address it?</dt><dd>Yes &mdash; you already ran both and have the numbers (recursive R&sup2;=&minus;0.61/&minus;4.11; direct R&sup2; still weak but not degenerate).</dd>
+          <dt>Additional experiment</dt><dd>Formalize with more seeds/lookback variants; report as a clean ablation table rather than an aside.</dd>
+          <dt>Expected strength</dt><dd>Not strong as a standalone contribution &mdash; this is <em>methodology hygiene</em>, valuable as a section within a larger paper (e.g., inside Gap 1's paper), not a paper by itself.</dd>
+          <dt>Risk</dt><dd>Low technically, but a reviewer may correctly say "this is expected, not novel" if presented alone &mdash; matches the user's own concern about architecture-level novelty.</dd>
+          <dt>Genuinely new?</dt><dd>The specific empirical demonstration for hemispheric solar data: probably yes. The general phenomenon: well known in ML, not new to the field at large.</dd>
+        </dl>
+      </div>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>4. Joint multivariate North+South forecasting vs. independent models</h4><span class="stars">★★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>Chen et al. 2024 model hemispheres, but it's unclear from available abstracts whether they explicitly test independent-vs-joint modeling as an ablation.</dd>
+          <dt>What's been done</dt><dd>Both hemispheres predicted, generally in the same paper/model, but a controlled independent-vs-joint <em>ablation</em> isn't clearly documented anywhere I found.</dd>
+          <dt>What's missing</dt><dd>A clean experiment isolating whether cross-hemispheric information transfer helps, at multiple horizons.</dd>
+          <dt>Why it matters</dt><dd>Tests whether the hemispheres are dynamically coupled enough that one helps predict the other &mdash; relevant to dynamo-coupling physics.</dd>
+          <dt>Can your dataset/model address it?</dt><dd>Yes &mdash; straightforward extension: a 2-output ResidualLSTM variant vs. two independent ones, same data.</dd>
+          <dt>Additional experiment</dt><dd>Train North-only, South-only, and joint [N,S]&rarr;[N,S] models; compare per-hemisphere skill.</dd>
+          <dt>Expected strength</dt><dd>Moderate as a standalone claim; strong as a secondary finding inside Gap 1's paper.</dd>
+          <dt>Risk</dt><dd>Could easily show "no meaningful difference," which is a fine but modest result.</dd>
+          <dt>Genuinely new?</dt><dd>Likely yes as a controlled ablation; the general idea of "hemispheres are coupled" is old physics (see Gap on polar flux imbalance), not new.</dd>
+        </dl>
+      </div>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>5. Cycle-phase-aware conditioning, tested rigorously</h4><span class="stars">★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>You already tried a fixed 132-month sinusoidal phase feature on the (dropped) monthly-mean total series &mdash; it made results slightly worse.</dd>
+          <dt>What's been done</dt><dd>Phase-dependent predictability is established (physics-based, total signal). Explicit phase-as-ML-input has apparently not been tried for hemispheric data.</dd>
+          <dt>What's missing</dt><dd>A physically correct phase feature (using actual historical minima dates, not a fixed period) has not been tested, hemisphere-specific.</dd>
+          <dt>Why it matters</dt><dd>Could explain part of Gap 1's predictability differences mechanistically.</dd>
+          <dt>Can your dataset/model address it?</dt><dd>Yes, with better phase-feature engineering than the fixed-132-month attempt.</dd>
+          <dt>Additional experiment</dt><dd>True phase-since-last-minimum feature (piecewise from documented cycle boundaries), tested as an ablation within Gap 1's framework.</dd>
+          <dt>Expected strength</dt><dd>Weak alone (an ablation, not a paper); useful as a component/explanatory analysis for Gap 1.</dd>
+          <dt>Risk</dt><dd>You already have one negative result here (fixed-period phase feature hurt performance) &mdash; a second failure would be an honest, if modest, finding.</dd>
+          <dt>Genuinely new?</dt><dd>Marginal &mdash; this is architecture-level tinkering, the exact thing the brief said to reject unless it answers a genuinely new question.</dd>
+        </dl>
+      </div>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>6. Systematic hindcast across all 14 available cycles (12&ndash;25), hemisphere-resolved</h4><span class="stars">★★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>Leave-one-cycle-out hindcasting exists for the total signal ("outperforms baseline 75% of the time," unspecified source paper). Javaraiah's series does per-cycle scalar prediction, not full-trajectory hindcasts.</dd>
+          <dt>What's been done</dt><dd>Total-signal hindcasting: yes. Hemisphere-resolved, full-trajectory hindcasting across many historical cycles: not found.</dd>
+          <dt>What's missing</dt><dd>A systematic "what would this model have said, deployed at each past cycle's minimum" study, separately for N and S.</dd>
+          <dt>Why it matters</dt><dd>Directly tests real-world forecast reliability without waiting a decade for Cycle 26 to resolve &mdash; satisfies the "not dependent on Cycle 26 finishing" requirement.</dd>
+          <dt>Can your dataset/model address it?</dt><dd>Yes &mdash; 151 years covers ~13 complete cycles, enough for a real (if small-N) hindcast study.</dd>
+          <dt>Additional experiment</dt><dd>For each of cycles 15&ndash;24 (leaving enough prior history to train), truncate data at that cycle's start, forecast it, score against the real outcome.</dd>
+          <dt>Expected strength</dt><dd>Strong as a companion to Gap 1 &mdash; converts "predictability" from an abstract backtest metric into concrete "here's what we'd have told you in 1954" case studies.</dd>
+          <dt>Risk</dt><dd>Small-N (only ~10 usable hindcast cycles) limits statistical power; early cycles have poorer underlying data quality.</dd>
+          <dt>Genuinely new?</dt><dd>The hemisphere-resolved, long-record version: yes, as far as this search found.</dd>
+        </dl>
+      </div>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>7. Joint amplitude + timing multi-task prediction, with N-S peak-time-difference as an explicit target</h4><span class="stars">★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>Chen et al. report peak time and amplitude separately per hemisphere but as point outputs from a general forecast, not an explicit multi-task formulation with an N-S timing-difference target.</dd>
+          <dt>What's been done</dt><dd>Amplitude prediction, timing prediction: both common. Peak-time-difference as a distinct, directly-optimized target: not found.</dd>
+          <dt>What's missing</dt><dd>Explicit multi-task loss jointly predicting amplitude, timing, and their N-S differences.</dd>
+          <dt>Why it matters</dt><dd>Peak-time lag between hemispheres is a known, physically meaningful quantity (see the 2013 phase-lag paper) &mdash; forecasting it directly, rather than deriving it after the fact, could reduce compounded error.</dd>
+          <dt>Can your dataset/model address it?</dt><dd>Yes, with a small architecture change (extra output heads).</dd>
+          <dt>Additional experiment</dt><dd>Multi-task ResidualLSTM variant vs. deriving the same quantities post hoc from two independent forecasts.</dd>
+          <dt>Expected strength</dt><dd>Moderate &mdash; a nice methodological refinement, best as a secondary contribution.</dd>
+          <dt>Risk</dt><dd>Could show no benefit over post-hoc derivation, in which case it's a small negative result.</dd>
+          <dt>Genuinely new?</dt><dd>Marginal-to-moderate; closer to architecture-level than problem-level novelty.</dd>
+        </dl>
+      </div>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>8. Uncertainty-quantified hemispheric forecasting with horizon-dependent interval growth</h4><span class="stars">★★★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>Bizzarri et al. 2022 do rigorous Bayesian uncertainty quantification &mdash; but for the <em>total</em> signal only, not hemispheric.</dd>
+          <dt>What's been done</dt><dd>Uncertainty-quantified DL forecasting: yes, for total SSN. Hemispheric: point estimates only (Chen et al., Ruiz et al. both report point forecasts or plain RMSE, not calibrated intervals).</dd>
+          <dt>What's missing</dt><dd>Calibrated, horizon-growing prediction intervals (conformal, quantile, or Bayesian) specifically for N and S separately.</dd>
+          <dt>Why it matters</dt><dd>A single point number ("peak = 47.0") is scientifically weaker than "peak = 47 [32, 61] with 90% coverage" &mdash; and lets you honestly report the wide uncertainty your own backtest already revealed (negative R&sup2; at long horizon) instead of a bare point estimate.</dd>
+          <dt>Can your dataset/model address it?</dt><dd>Yes &mdash; deep ensembles (you already have 3-seed ensembles) give a cheap uncertainty estimate; conformal calibration on top is straightforward.</dd>
+          <dt>Additional experiment</dt><dd>Quantile-loss or conformal-calibrated version of the direct multi-horizon model; report PICP (interval coverage) at each horizon, per hemisphere.</dd>
+          <dt>Expected strength</dt><dd>Strong when combined with Gap 1 &mdash; "here's how uncertain each hemisphere's forecast is, and why" is a complete, defensible paper.</dd>
+          <dt>Risk</dt><dd>Low-moderate; conformal prediction is well-established machinery, main risk is calibration failing under the same distribution shift that hurts point forecasts.</dd>
+          <dt>Genuinely new?</dt><dd>Yes for the hemispheric case specifically.</dd>
+        </dl>
+      </div>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>9. Connecting hemispheric predictability to physical drivers (polar flux imbalance, asymmetry index history)</h4><span class="stars">★★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>"Is hemispheric asymmetry solely governed by polar flux imbalance?" (arXiv:1906.06877) studies the driver of <em>amplitude</em> asymmetry, not <em>predictability</em> asymmetry.</dd>
+          <dt>What's been done</dt><dd>Physical mechanisms for amplitude/phase asymmetry: actively studied. Physical correlates of forecast-skill asymmetry: not found.</dd>
+          <dt>What's missing</dt><dd>Testing whether cycles/periods with larger N-S amplitude asymmetry also show larger predictability asymmetry (i.e., does physical imbalance track forecasting difficulty?).</dd>
+          <dt>Why it matters</dt><dd>Would turn an ML result into a physically interpretable one &mdash; the kind of link Solar Physics reviewers specifically reward.</dd>
+          <dt>Can your dataset/model address it?</dt><dd>Yes, using the same 151-year record's historical asymmetry index alongside Gap 1's predictability metrics.</dd>
+          <dt>Additional experiment</dt><dd>Correlate per-cycle predictability (from Gap 6's hindcasts) against per-cycle amplitude-asymmetry index.</dd>
+          <dt>Expected strength</dt><dd>Strong as the "physical interpretation" section of a Gap 1 + Gap 6 paper; not a standalone paper.</dd>
+          <dt>Risk</dt><dd>Correlational, small-N (per-cycle) &mdash; needs honest statistical caveats.</dd>
+          <dt>Genuinely new?</dt><dd>Yes, this specific link.</dd>
+        </dl>
+      </div>
+
+      <div class="gap-card">
+        <div class="gap-head"><h4>10. Direct comparison of ML-based vs. physics-based (flux-transport, precursor) predictability estimates, per hemisphere</h4><span class="stars">★★</span></div>
+        <dl class="gap-grid">
+          <dt>Existing literature</dt><dd>Physics-based predictability-vs-phase exists for the total signal (flux-transport, data assimilation). ML-based predictability doesn't yet exist per hemisphere (that's Gap 1).</dd>
+          <dt>What's been done</dt><dd>Each approach separately, for the total signal.</dd>
+          <dt>What's missing</dt><dd>A head-to-head, hemisphere-resolved comparison of what each paradigm says is predictable and when.</dd>
+          <dt>Why it matters</dt><dd>Would be genuinely interesting, but requires either reimplementing a physics-based (flux-transport) model or partnering with someone who has one &mdash; likely out of scope for a solo ML-focused study.</dd>
+          <dt>Can your dataset/model address it?</dt><dd>Only the ML half; the physics half requires tools/data you don't currently have.</dd>
+          <dt>Additional experiment</dt><dd>Substantial &mdash; would need a flux-transport model implementation or collaboration.</dd>
+          <dt>Expected strength</dt><dd>Strong in principle, but high effort/dependency risk given current resources.</dd>
+          <dt>Risk</dt><dd>High &mdash; likely infeasible solo, on a reasonable timeline.</dd>
+          <dt>Genuinely new?</dt><dd>Yes, but not realistically executable right now &mdash; noted for completeness, not recommended.</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section id="partc">
+      <div class="part-label">Part C</div>
+      <h2>Top 5 strongest novelty ideas (including new ones beyond your original list)</h2>
+      <p class="sub">Ranked by (novelty &times; feasibility &times; defensibility), not by novelty alone.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Rank</th><th>Idea</th><th>Tier</th><th>Why it ranks here</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td><b>Hemispheric predictability asymmetry</b> (Gap 1) &mdash; do North and South have statistically different, quantifiable forecast-skill decay, and does that itself vary by cycle phase?</td><td><span class="tag tier1">Tier 1</span></td><td>Confirmed-absent from the literature by direct search; uses your exact dataset and validated architecture; produces a falsifiable, phase-independent scientific claim.</td></tr>
+            <tr><td class="num">2</td><td><b>Uncertainty-quantified hemispheric forecasting</b> (Gap 8), horizon-dependent interval growth per hemisphere</td><td><span class="tag tier1">Tier 1</span></td><td>Extends a proven technique (Bayesian/ensemble UQ, established for total SSN) into an unaddressed hemispheric context; naturally combines with Rank 1.</td></tr>
+            <tr><td class="num">3</td><td><b>Systematic multi-cycle hindcast</b> (Gap 6), hemisphere-resolved, across ~10 historical cycles</td><td><span class="tag tiermid">Tier 2</span></td><td>Grounds Rank 1's abstract predictability metric in concrete "what would we have said in 1954/1976/1996" case studies; small-N limits it as a standalone paper.</td></tr>
+            <tr><td class="num">4</td><td><b>Physical correlate of predictability asymmetry</b> (Gap 9) &mdash; does amplitude-asymmetry track forecast-skill asymmetry?</td><td><span class="tag tiermid">Tier 2</span></td><td>Turns an ML finding into a physically interpretable one; correlational and small-N, best as a discussion section, not the core claim.</td></tr>
+            <tr><td class="num">5</td><td><b>Chaos/Lyapunov-exponent bridge</b> (Gap 2), per hemisphere, connected to empirical ML skill decay</td><td><span class="tag tiermid">Tier 2</span></td><td>Genuinely unexplored intersection, but the Lyapunov estimation itself is old technique on new (hemisphere-split) data &mdash; needs Rank 1 to carry the paper.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sub"><b>Two new ideas from outside the original list, both real but weaker for you specifically right now:</b> (a) <i>self-supervised representation learning across the 14 historical cycles</i> (pretrain on cycle-shape reconstruction, fine-tune for Cycle 26) &mdash; genuinely underexplored in solar physics, but a much larger engineering lift with uncertain payoff for a 14-cycle dataset (deep self-supervised methods typically want far more independent samples); (b) <i>distribution-shift / concept-drift detection across the Modern Maximum vs. the ongoing Modern Minimum-like decline</i> (is the 1874&ndash;1950 low-activity era statistically a different regime than 1950&ndash;2025, and does mixing them hurt or help forecasting?) &mdash; interesting and dataset-native, but more exploratory and harder to pre-register a clean hypothesis for.</p>
+    </section>
+
+    <section id="partd">
+      <div class="part-label">Part D</div>
+      <h2>Your original ideas A&ndash;J, scored against the evidence</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Your idea</th><th>Verdict</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td><b>A.</b> Hemispheric asymmetry forecasting (N-S index over time)</td><td><span class="tag tier4">Reject as primary claim</span></td><td>Javaraiah I&ndash;V (2007&ndash;2021) is a whole series on exactly this, plus Chen et al. 2024 and the 2202.13838 paper. Extensively covered.</td></tr>
+            <tr><td><b>B.</b> N-S phase-lag prediction (which hemisphere peaks first, by how much)</td><td><span class="tag tier4">Reject as primary claim</span></td><td>"Phase lags of solar hemispheric cycles" (2013) plus the asymmetry-prediction series characterize this already. <i>Predicting</i> it via a multi-task DL target (your Idea J) is a smaller, legitimate refinement &mdash; see Gap 7 &mdash; not a standalone paper.</td></tr>
+            <tr><td><b>C.</b> Joint multivariate [N,S] forecasting vs. independent</td><td><span class="tag tiermid">Keep as secondary ablation</span></td><td>Not clearly isolated as a controlled ablation anywhere found (Gap 4) &mdash; worth doing, but it's a component of a paper, not the paper.</td></tr>
+            <tr><td><b>D.</b> Cycle-phase-aware features</td><td><span class="tag tier4">Reject as primary claim</span></td><td>Phase-dependent predictability is established (physics-based). You already tried a phase feature and it made things worse &mdash; architecture-level tinkering, explicitly the kind of thing the brief said not to lean on.</td></tr>
+            <tr><td><b>E.</b> Direct-vs-recursive as its own methodological study</td><td><span class="tag tiermid">Keep as a section, not a paper</span></td><td>You already have this result. Valuable as a documented negative control inside a larger paper (Gap 3); alone, a reviewer will call it expected behavior in ML, not new science.</td></tr>
+            <tr><td><b>F.</b> Forecastability across cycle phases</td><td><span class="tag tiermid">Keep, reframed hemisphere-resolved</span></td><td>Established for the total signal (physics-based). The hemisphere-resolved, ML-based version is open &mdash; this folds directly into Rank 1's design (Gap 1).</td></tr>
+            <tr><td><b>G.</b> Predictability horizon ("how far ahead is useful?")</td><td><span class="tag tier1">This is the core of the strongest idea</span></td><td>Exists in theory (Lyapunov, ~16 months, total signal only). Never done empirically, hemisphere-resolved, with modern ML. This is Gap 1/2 &mdash; keep, and make it central.</td></tr>
+            <tr><td><b>H.</b> Uncertainty growth with horizon</td><td><span class="tag tier1">Strong secondary pillar</span></td><td>Done for total SSN (Bizzarri et al.), not for hemispheric. Genuinely open there &mdash; Gap 8.</td></tr>
+            <tr><td><b>I.</b> Historical pseudo-Cycle-26 hindcasting</td><td><span class="tag tiermid">Keep as supporting evidence</span></td><td>Total-signal hindcasting exists in some form ("outperforms baseline 75% of the time"). Hemisphere-resolved, systematic, multi-cycle version not found &mdash; Gap 6, good companion to Gap 1.</td></tr>
+            <tr><td><b>J.</b> Joint amplitude + timing multi-task prediction</td><td><span class="tag tiermid">Minor, keep as refinement</span></td><td>Not found as an explicit multi-task formulation, but this is closer to architecture-level than problem-level novelty &mdash; Gap 7, secondary at best.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout reject">
+        <b>Bottom line on your original framing:</b> ideas A, B, and D should be dropped as primary contributions &mdash; they're well-trodden. G and H are exactly right, and are the strongest things on your own list; the evidence supports building the paper around them, not around A/B.
+      </div>
+    </section>
+
+    <section id="parte">
+      <div class="part-label">Part E</div>
+      <h2>Single strongest recommended novelty</h2>
+      <div class="claim-box">
+        <div class="label">Working title of the contribution</div>
+        <p>Hemispheric predictability asymmetry: are the Northern and Southern solar hemispheres equally forecastable, and does that gap change with solar-cycle phase? &mdash; the first empirical, ML-based, long-record (1874&ndash;2025) answer to a question the field has asked about amplitude and phase, but not about forecast skill itself.</p>
+      </div>
+      <p class="sub">This is Gap 1, carrying Gap 8 (uncertainty quantification) and Gap 6 (multi-cycle hindcast) as supporting pillars, with Gap 9 (physical correlate) as the discussion/interpretation section. It satisfies every constraint in your Task 8: scientifically meaningful, confirmed-underexplored by direct search, feasible with data and code you already have, falsifiable, reproducible, doesn't require waiting for Cycle 26 to resolve, and produces quantitative, tabulable results (skill-vs-horizon curves, per-hemisphere Lyapunov estimates, hindcast scorecards) rather than a single contestable point forecast.</p>
+    </section>
+
+    <section id="partf">
+      <div class="part-label">Part F</div>
+      <h2>Complete experimental design</h2>
+
+      <h3>Research question</h3>
+      <p class="sub">Do the Northern and Southern solar hemispheres exhibit systematically different empirical forecast predictability (skill decay with horizon), and if so, does this predictability asymmetry itself vary with solar-cycle phase and correlate with the known amplitude/phase asymmetry?</p>
+
+      <h3>Hypothesis</h3>
+      <p class="sub"><b>H1 (primary):</b> There is a statistically significant difference between North and South in forecast skill (RMSE/R&sup2;) at one or more forecast horizons, beyond what's explained by sampling noise. <b>H0 (null, and a fully acceptable publishable outcome):</b> No significant difference exists at any tested horizon &mdash; the hemispheres are equally predictable despite differing in amplitude and phase.</p>
+
+      <h3>Scientific motivation</h3>
+      <p class="sub">Amplitude and phase asymmetry between hemispheres is well established and physically linked to independent, imperfectly-synchronized hemispheric dynamos. If the dynamos are truly semi-independent, there's no a priori reason their <em>predictability</em> should be identical &mdash; one hemisphere could be a "noisier" dynamical system than the other. This has never been measured.</p>
+
+      <h3>Novel contribution</h3>
+      <p class="sub">(1) First empirical, ML-based, long-record (151-year) quantification of hemisphere-specific forecast-skill decay vs. horizon. (2) First connection between that empirical decay and the theoretical chaos/Lyapunov-based predictability literature, computed per hemisphere. (3) A documented negative control (the recursive-forecast failure) establishing methodological ground truth other groups can build on. (4) Calibrated, horizon-growing uncertainty intervals per hemisphere, not previously reported for hemispheric SSN.</p>
+
+      <h3>Dataset</h3>
+      <p class="sub">The 151-year spliced hemispheric monthly and 13-month-smoothed series (Veronig et al. 2021, 1874&ndash;2020, + SILSO official 2020&ndash;2025), validated in the overlap period (this session: r=1.000 both hemispheres after the column-mapping fix, mean abs. difference &lt;0.03 sunspots). Document the splice and validation explicitly as a methods subsection &mdash; it's a real, checkable contribution in its own right, distinct from the ML.</p>
+
+      <h3>Input variables</h3>
+      <p class="sub">Primary: lagged hemispheric SSN (lookback window, size swept as an ablation). Secondary/ablation only, not the headline model: cycle-phase-since-minimum feature (computed from documented historical minima, not a fixed period &mdash; fixing the flaw in the earlier fixed-132-month attempt).</p>
+
+      <h3>Target variables</h3>
+      <p class="sub">Per-hemisphere SSN at each of several fixed horizons (1, 3, 6, 12, 24, 36, 60, 120, 157 months), evaluated both as point forecasts and as calibrated intervals.</p>
+
+      <h3>Baselines</h3>
+      <p class="sub">Naive persistence; climatological mean (per-phase, since a plain unconditional mean is a weak baseline for a cyclical signal); the already-validated single-horizon ResidualLSTM/LSTM/GRU suite; the failed recursive multi-step model (kept explicitly as a documented negative control, not discarded).</p>
+
+      <h3>Proposed model</h3>
+      <p class="sub">Direct multi-horizon ResidualLSTM (already built), trained and evaluated <em>separately</em> for North and South, with a deep-ensemble (3+ seed) or conformal-calibrated uncertainty layer added on top.</p>
+
+      <h3>Ablation experiments</h3>
+      <ul class="fix-list">
+        <li>Lookback length sweep (14, 60, 132 months) &times; each hemisphere.</li>
+        <li>Independent North/South models vs. joint [N,S]&rarr;[N,S] model (Gap 4).</li>
+        <li>With vs. without a true cycle-phase-since-minimum feature (Gap 5, correctly implemented this time).</li>
+        <li>Recursive vs. direct-horizon, kept as the documented negative control.</li>
+      </ul>
+
+      <h3>Validation strategy</h3>
+      <p class="sub">Primary: the existing chronological 70/15/15 split. Secondary, required for Gap 6: rolling-origin hindcast anchored at each historical cycle's minimum (cycles ~15&ndash;24, as many as leave enough prior training history), scored against the real historical outcome for that cycle.</p>
+
+      <h3>Statistical tests</h3>
+      <p class="sub">Paired bootstrap (as already used for the monthly-mean GRU-vs-ResidualLSTM tie) or a Diebold-Mariano test on squared-error differences, North vs. South, at each horizon &mdash; the exact test needed to make H1/H0 a real statistical claim rather than "our number was bigger."</p>
+
+      <h3>Uncertainty methodology</h3>
+      <p class="sub">Deep-ensemble spread as a first uncertainty estimate (cheap, already partially built); conformal calibration on top for a formally valid coverage guarantee. Report PICP (prediction interval coverage probability) at each horizon, per hemisphere &mdash; if North's intervals are well-calibrated but South's aren't (or vice versa), that itself is evidence for H1.</p>
+
+      <h3>Expected figures</h3>
+      <p class="sub">Skill-vs-horizon curves (RMSE and R&sup2;), North and South overlaid, with confidence bands; hindcast scorecard (predicted vs. actual peak, per historical cycle, per hemisphere); uncertainty-interval-width-vs-horizon plot; Lyapunov-exponent comparison bar chart with theoretical vs. empirical predictability horizon marked; a phase-stratified error plot (rise/max/decline/min &times; hemisphere).</p>
+
+      <h3>Expected tables</h3>
+      <p class="sub">Full metrics per hemisphere per horizon per model variant; hindcast results table (predicted vs. actual, per cycle); statistical test results (p-values, effect sizes) for the N-vs-S skill comparison at each horizon; ablation results (lookback sweep, joint-vs-independent, phase-feature).</p>
+
+      <h3>Evaluation metrics</h3>
+      <p class="sub">RMSE, MAE, R&sup2; per horizon; PICP and mean interval width for uncertainty calibration; Diebold-Mariano statistic / bootstrap CI for the core N-vs-S comparison.</p>
+
+      <h3>Failure criteria (what would falsify H1)</h3>
+      <p class="sub">If, across all tested horizons, the bootstrap/DM test shows no statistically significant N-vs-S skill difference (confidence intervals overlapping zero at every horizon), H1 is rejected and H0 stands &mdash; report this as the finding, not as a failed experiment. This is explicitly designed so a null result is still a complete, honest, publishable paper, not a dead end.</p>
+    </section>
+
+    <section id="partg">
+      <div class="part-label">Part G</div>
+      <h2>Exact research questions and hypotheses</h2>
+      <ol class="fix-list">
+        <li><b>RQ1:</b> Does empirical forecast skill (RMSE/R&sup2;) differ significantly between North and South at any forecast horizon from 1 to 157 months? <i>H1: yes, at &ge;1 horizon. H0: no, at any horizon.</i></li>
+        <li><b>RQ2:</b> Does the direction/magnitude of any skill asymmetry change with solar-cycle phase (rise/max/decline/min)? <i>H1: skill asymmetry is phase-dependent. H0: asymmetry (if any) is constant across phase.</i></li>
+        <li><b>RQ3:</b> Does the empirical ML predictability horizon (where skill degrades to climatology/persistence level) align with the theoretical Lyapunov-based horizon (~16 months for the total signal), separately per hemisphere? <i>H1: empirical and theoretical horizons agree within a documented tolerance, per hemisphere. H0: they diverge substantially, suggesting either method is measuring something different from "true" predictability.</i></li>
+        <li><b>RQ4:</b> Does joint [N,S] modeling outperform independent per-hemisphere modeling at any horizon? <i>H1: yes, indicating exploitable cross-hemispheric coupling. H0: no, hemispheres are effectively independent for forecasting purposes.</i></li>
+        <li><b>RQ5:</b> Does historical amplitude-asymmetry (per cycle) correlate with that cycle's hindcast-measured predictability asymmetry? <i>H1: significant correlation. H0: none detectable given ~10 usable historical cycles.</i></li>
+      </ol>
+    </section>
+
+    <section id="parth">
+      <div class="part-label">Part H</div>
+      <h2>Proposed paper title options</h2>
+      <ul class="fix-list">
+        <li>"Are the Solar Hemispheres Equally Predictable? A 151-Year Empirical Forecast-Skill Comparison"</li>
+        <li>"Hemispheric Predictability Asymmetry in the Sunspot Cycle: Evidence from a 1874&ndash;2025 Record"</li>
+        <li>"Forecast-Skill Decay and Its Hemispheric Asymmetry Across Fourteen Solar Cycles"</li>
+        <li>"How Far Ahead Can We See? Quantifying Hemispheric Solar-Cycle Predictability, 1874&ndash;2025"</li>
+        <li>"North Versus South: A Long-Record Test of Differential Solar-Cycle Predictability"</li>
+      </ul>
+    </section>
+
+    <section id="parti">
+      <div class="part-label">Part I</div>
+      <h2>Expected contribution statement</h2>
+      <p class="sub">"Using a validated 151-year (1874&ndash;2025) hemispheric sunspot-number record &mdash; four times longer than prior deep-learning hemispheric studies &mdash; we provide the first empirical, statistically tested comparison of forecast predictability between the Northern and Southern solar hemispheres across forecast horizons from one month to thirteen years. We document a methodological negative control (recursive multi-step forecasting fails catastrophically; direct multi-horizon forecasting does not), connect our empirical predictability-horizon estimates to prior chaos-theoretic (Lyapunov-exponent) limits computed separately per hemisphere, and report calibrated, horizon-growing uncertainty intervals absent from prior hemispheric point-forecast studies. We test, rather than assume, whether this predictability asymmetry tracks the well-established amplitude and phase asymmetry between hemispheres."</p>
+    </section>
+
+    <section id="partj">
+      <div class="part-label">Part J</div>
+      <h2>Likely reviewer objections</h2>
+      <div class="qa"><div class="q">1. "Hemispheric asymmetry has been studied for decades (Javaraiah et al.) &mdash; what's new here?"</div><div class="a">Javaraiah's series predicts <em>amplitude</em> from asymmetry, cycle-by-cycle, via classical regression. This paper measures <em>predictability itself</em> &mdash; a different, unaddressed quantity &mdash; via ML skill-decay curves.</div></div>
+      <div class="qa"><div class="q">2. "Chen et al. (2024) already did hemispheric deep learning for Cycles 25/26."</div><div class="a">Correct, and cited directly. Their hemispheric data covers 1992&ndash;2023 (32 years); this study uses 1874&ndash;2025 (151 years). More importantly, they report point forecasts only &mdash; no horizon-vs-skill curve, no N-vs-S predictability comparison, no uncertainty quantification. Those specific absences are this paper's contribution, not "we also did hemispheric DL."</div></div>
+      <div class="qa"><div class="q">3. "Only ~10&ndash;13 usable solar cycles is a very small sample for a statistical claim."</div><div class="a">True, and stated explicitly as a limitation. The primary claim (RQ1, skill-vs-horizon within the standard train/val/test split) rests on hundreds of monthly test points, not cycle-count; only the hindcast (RQ5) and phase-correlation analyses are cycle-limited, and are presented with appropriately wide uncertainty, not overclaimed.</div></div>
+      <div class="qa"><div class="q">4. "Could the observed asymmetry just be a smoothing artifact from the 13-month running mean?"</div><div class="a">Addressed directly: the study runs on both the smoothed and (if retained) monthly-mean series, and any asymmetry claim is required to hold on the less-smoothed series too before being reported as robust.</div></div>
+      <div class="qa"><div class="q">5. "Why should a solar physicist care about an ML backtest metric?"</div><div class="a">Because it's tied, explicitly, to two things physicists already care about: the chaos-theoretic Lyapunov literature (RQ3) and the known amplitude/phase asymmetry (RQ5) &mdash; the ML result is the bridge, not the endpoint.</div></div>
+      <div class="qa"><div class="q">6. "A negative result (H0, no asymmetry) is unpublishable."</div><div class="a">Not for this venue/framing: "hemispheres are equally predictable despite differing in amplitude and phase" is itself informative about how (a)symmetric the underlying dynamo really is, and is pre-registered as an acceptable outcome, not spun after the fact.</div></div>
+
+      <h2 style="margin-top:2rem;">Part K &mdash; how to answer each</h2>
+      <p class="sub" id="partk">Answers are embedded inline above (each "a." row); the short version for a rebuttal letter: <b>lead with the specific absence in each competing paper</b> (no skill-curve, no per-hemisphere uncertainty, no chaos-limit connection, short record) rather than re-asserting general novelty.</p>
+    </section>
+
+    <section id="partl">
+      <div class="part-label">Part L</div>
+      <h2>Do-not-claim list</h2>
+      <p class="sub">Claims the evidence gathered here does <b>not</b> support. Using any of these will hand a reviewer familiar with the literature an easy rejection.</p>
+      <ul class="fix-list">
+        <li><b>"First deep learning model for hemispheric sunspot prediction."</b> False &mdash; Chen et al. 2024 and at least one 2023 ScienceDirect paper precede this.</li>
+        <li><b>"First study of North-South asymmetry in solar cycle prediction."</b> False &mdash; Javaraiah's 5-paper series runs 2007&ndash;2021.</li>
+        <li><b>"First to predict Solar Cycle 26."</b> False &mdash; at minimum Chen et al. (2024), Ruiz et al. (2024), your own Kumar &amp; Kumar (2025), and an LSTM-FCN paper (2025) already do this.</li>
+        <li><b>"Our model outperforms Ruiz et al. / Chen et al." based on the current point-forecast comparison alone.</b> Not established &mdash; different data spans, different validation protocols, and your own backtest already shows weak long-horizon skill (R&sup2;&lt;0). A comparison is only fair once both use matched validation windows and the same horizon definition.</li>
+        <li><b>"We use more historical data" as the novelty, on its own.</b> Explicitly rejected in your own brief, and correctly so &mdash; longer data is a precondition for the real claim (predictability asymmetry), not the claim itself.</li>
+        <li><b>"Novel hybrid/LSTM+CNN/Transformer architecture."</b> Already rejected in the earlier round of this work (ResidualLSTM has direct prior art: DLinear, RevIN-LSTM hybrids, ARIMA-LSTM hybrids) &mdash; do not resurrect this framing here.</li>
+        <li><b>"We establish the predictability limit of solar activity."</b> Overreach &mdash; the Lyapunov/chaos literature already estimates a theoretical limit for the total signal; this work tests whether the empirical ML result agrees with it, per hemisphere &mdash; a narrower, defensible claim.</li>
+        <li><b>Any claim about the accuracy of the actual Cycle 26 peak number</b> stated with confidence not backed by the calibrated interval &mdash; report it as a point estimate with its (likely wide) uncertainty band, not as a prediction to be believed.</li>
+      </ul>
+    </section>
+
+    <footer>
+      Compiled from live web searches run in this session (~10 queries, multiple direct fetches of abstract/data pages). Full-text access to several Solar Physics/ApJ/MNRAS papers was paywalled; entries marked "unconfirmed" rest on search-snippet abstracts only and should be verified against the primary source before citing in a manuscript.
+    </footer>
+
+  </main>
+</div>

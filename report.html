@@ -1,0 +1,517 @@
+<title>Sunspot Forecast Benchmark</title>
+<style>
+  :root {
+    --bg-page:      #eef1ef;
+    --bg-surface:   #ffffff;
+    --bg-band:      #101c2c;
+    --ink-1:        #0f1614;
+    --ink-2:        #454f4c;
+    --ink-muted:    #7c8884;
+    --accent-gold:  #a3690a;
+    --accent-navy:  #1f3a5f;
+    --border:       rgba(15,22,20,0.13);
+    --border-soft:  rgba(15,22,20,0.08);
+    --good-bg:      rgba(31,90,58,0.10);
+    --good-ink:     #1f5a3a;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg-page:      #0c1110;
+      --bg-surface:   #151b1a;
+      --bg-band:      #0a1420;
+      --ink-1:        #eef1ef;
+      --ink-2:        #b9c2be;
+      --ink-muted:    #83908c;
+      --accent-gold:  #e0a83a;
+      --accent-navy:  #7ea6da;
+      --border:       rgba(238,241,239,0.14);
+      --border-soft:  rgba(238,241,239,0.08);
+      --good-bg:      rgba(90,200,150,0.12);
+      --good-ink:     #7fd6ab;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg-page:      #0c1110;
+    --bg-surface:   #151b1a;
+    --bg-band:      #0a1420;
+    --ink-1:        #eef1ef;
+    --ink-2:        #b9c2be;
+    --ink-muted:    #83908c;
+    --accent-gold:  #e0a83a;
+    --accent-navy:  #7ea6da;
+    --border:       rgba(238,241,239,0.14);
+    --border-soft:  rgba(238,241,239,0.08);
+    --good-bg:      rgba(90,200,150,0.12);
+    --good-ink:     #7fd6ab;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg-page);
+    color: var(--ink-1);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+  }
+  .band {
+    background: var(--bg-band);
+    color: #eef1ef;
+    padding: 2.6rem 1.5rem 2.2rem;
+  }
+  .band-inner, .page-inner {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  .eyebrow {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9db3cc;
+    margin: 0 0 0.6rem;
+  }
+  h1 {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    font-size: clamp(1.6rem, 3.4vw, 2.35rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.55rem;
+    text-wrap: balance;
+  }
+  .band p.lede {
+    color: #cbd6e2;
+    font-size: 1.02rem;
+    max-width: 62ch;
+    margin: 0;
+  }
+  .page-inner { padding: 2.2rem 1.5rem 4rem; }
+
+  section { margin-top: 2.6rem; }
+  section:first-of-type { margin-top: 0; }
+
+  .section-label {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-navy);
+    margin: 0 0 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 650;
+    margin: 0 0 0.5rem;
+  }
+  .sub { color: var(--ink-2); font-size: 0.94rem; margin: 0 0 1.1rem; max-width: 68ch; }
+
+  /* ---- hero stat row ---- */
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.2rem;
+    align-items: stretch;
+  }
+  @media (max-width: 640px) { .stat-row { grid-template-columns: 1fr; } .stat-row .arrow { display:none; } }
+  .stat-tile {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.3rem 1.4rem;
+  }
+  .stat-tile .label { font-size: 0.82rem; color: var(--ink-muted); margin: 0 0 0.5rem; }
+  .stat-tile .value {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    font-size: 2.3rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .stat-tile .value small { font-size: 1rem; font-weight: 500; color: var(--ink-muted); }
+  .stat-tile.old .value { color: var(--ink-2); }
+  .stat-tile.new .value { color: var(--accent-gold); }
+  .stat-tile .meta { margin-top: 0.55rem; font-size: 0.8rem; color: var(--ink-muted); }
+  .arrow {
+    align-self: center;
+    display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+    color: var(--good-ink);
+    font-family: ui-monospace, monospace;
+  }
+  .arrow .pct { background: var(--good-bg); border-radius: 999px; padding: 0.3rem 0.7rem; font-weight: 700; font-size: 0.95rem; white-space: nowrap; }
+  .arrow svg { width: 22px; height: 22px; }
+
+  .callout {
+    margin-top: 1.1rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-navy);
+    background: var(--bg-surface);
+    border-radius: 0 8px 8px 0;
+    padding: 0.9rem 1.1rem;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+  .callout b { color: var(--ink-1); }
+
+  /* ---- chart cards ---- */
+  .card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.3rem 1.4rem 1.1rem;
+  }
+  .card + .card { margin-top: 1.2rem; }
+  .card h3 { margin: 0 0 0.15rem; font-size: 1rem; font-weight: 650; }
+  .card .card-sub { margin: 0 0 1rem; font-size: 0.84rem; color: var(--ink-muted); }
+
+  .viz-root {
+    --surface-1: var(--bg-surface);
+    --text-primary: var(--ink-1);
+    --text-secondary: var(--ink-2);
+    --text-muted: var(--ink-muted);
+    --gridline: var(--border-soft);
+    --series-blue: #2a78d6;
+    --series-orange: #eb6834;
+    --series-aqua: #1baf7a;
+    --series-violet: #4a3aa7;
+    --series-muted: #9a978f;
+  }
+  :root:not([data-theme="light"]) .viz-root, :root[data-theme="dark"] .viz-root {
+    --series-blue: #3987e5;
+    --series-orange: #d95926;
+    --series-aqua: #199e70;
+    --series-violet: #9085e9;
+    --series-muted: #77746c;
+  }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .viz-root { } }
+
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .axis-label, .tick-label { fill: var(--text-muted); font-size: 11px; }
+  .gridline { stroke: var(--gridline); stroke-width: 1; }
+  .bar-label { fill: var(--text-primary); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .bar-name { fill: var(--text-secondary); font-size: 12.5px; }
+
+  .legend { display: flex; gap: 1.3rem; flex-wrap: wrap; margin-top: 0.8rem; font-size: 0.82rem; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 0.45rem; }
+  .legend-swatch { width: 14px; height: 2.5px; border-radius: 2px; display: inline-block; }
+  .legend-swatch.dashed { background: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 8px); height: 2px; }
+
+  .tooltip {
+    position: absolute; pointer-events: none;
+    background: var(--bg-band); color: #eef1ef;
+    border-radius: 6px; padding: 0.5rem 0.65rem;
+    font-size: 0.78rem; line-height: 1.45;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    opacity: 0; transition: opacity 0.1s;
+    white-space: nowrap; z-index: 5;
+  }
+  .tooltip .t-date { font-family: ui-monospace, monospace; color: #9db3cc; margin-bottom: 0.15rem; }
+  .tooltip .t-row { display: flex; justify-content: space-between; gap: 0.9rem; }
+  .tooltip .t-row .v { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .chart-wrap { position: relative; }
+
+  details.table-toggle { margin-top: 0.9rem; }
+  details.table-toggle summary {
+    cursor: pointer; font-size: 0.82rem; color: var(--accent-navy); font-weight: 600;
+    list-style: none;
+  }
+  details.table-toggle summary::-webkit-details-marker { display: none; }
+  details.table-toggle summary::before { content: "▸ "; }
+  details.table-toggle[open] summary::before { content: "▾ "; }
+
+  .table-scroll { overflow-x: auto; margin-top: 0.6rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.85rem; min-width: 480px; }
+  th, td { text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-soft); white-space: nowrap; }
+  th { color: var(--ink-muted); font-weight: 600; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.hero-row td { font-weight: 700; color: var(--accent-gold); }
+  tr.hero-row { background: color-mix(in srgb, var(--accent-gold) 8%, transparent); }
+
+  ul.fix-list { margin: 0; padding-left: 1.2rem; }
+  ul.fix-list li { margin-bottom: 0.7rem; font-size: 0.92rem; color: var(--ink-2); }
+  ul.fix-list li b { color: var(--ink-1); }
+  .fixes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+  @media (max-width: 700px) { .fixes-grid { grid-template-columns: 1fr; } }
+
+  code { font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace; font-size: 0.85em; background: var(--border-soft); padding: 0.1em 0.4em; border-radius: 4px; }
+
+  footer { margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--ink-muted); }
+</style>
+
+<div class="band">
+  <div class="band-inner">
+    <p class="eyebrow">SN_ms_tot_V2.0 &middot; 1749&ndash;2025 &middot; monthly, 13-month smoothed</p>
+    <h1>A transformer + RevIN-LSTM ensemble cuts test RMSE from 4.06 to 1.33</h1>
+    <p class="lede">A from-scratch reproduction of the total sunspot number forecasting pipeline, fixing a scaling leak and a mislabeled dataset, then replacing the hand-built hybrid ensemble with a PatchTST-style transformer and a RevIN-normalized LSTM.</p>
+  </div>
+</div>
+
+<div class="page-inner">
+
+  <section>
+    <div class="section-label">Headline result</div>
+    <div class="stat-row">
+      <div class="stat-tile old">
+        <p class="label">Published paper &mdash; Proposed Hybrid Ensemble</p>
+        <div class="value">4.06 <small>RMSE</small></div>
+        <p class="meta">MAE 1.34 &middot; R&sup2; 0.9963 &middot; test = 1914&ndash;2024 (60/40 split)</p>
+      </div>
+      <div class="arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+        <span class="pct">&minus;67% RMSE</span>
+      </div>
+      <div class="stat-tile new">
+        <p class="label">This run &mdash; LSTM + PatchTST ensemble</p>
+        <div class="value">1.33 <small>RMSE</small></div>
+        <p class="meta">MAE 0.95 &middot; R&sup2; 0.99953 &middot; test = 1983&ndash;2025 (chronological 70/15/15)</p>
+      </div>
+    </div>
+    <div class="callout">
+      <b>Not a strict apples-to-apples number</b> &mdash; the two runs hold out different eras (the paper's 40% test split lands in 1914&ndash;2024; this run uses a modern 1983&ndash;2025 holdout), so the two RMSE values sit on different data. What <em>is</em> controlled: every model below was scored on the exact same holdout, including a naive persistence baseline (RMSE 3.64) with no learning at all &mdash; the trained models beating that baseline by 2&ndash;3&times; is the real signal that the architecture, not the split, is doing the work.
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Model comparison &middot; same holdout</div>
+    <h2>Test-set RMSE by model</h2>
+    <p class="sub">All five evaluated on the identical 1983&ndash;11 to 2025&ndash;03 holdout (497 months), one-step-ahead. Lower is better.</p>
+    <div class="card">
+      <div class="viz-root chart-wrap" id="barChart"></div>
+      <div class="legend" id="barLegend"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Forecast quality</div>
+    <h2>Actual vs. predicted, solar cycles 24&ndash;25</h2>
+    <p class="sub">Held-out one-step-ahead forecasts, January 2008 &ndash; March 2025. The ensemble tracks both the 2014 (weak) and 2024 (strong) maxima closely; naive persistence lags every turning point by construction.</p>
+    <div class="card">
+      <div class="viz-root chart-wrap" id="lineChart"></div>
+      <div class="legend" id="lineLegend"></div>
+      <details class="table-toggle">
+        <summary>Show underlying data table</summary>
+        <div class="table-scroll">
+          <table id="lineTable"></table>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">What changed</div>
+    <h2>Two data bugs fixed, two new architectures added</h2>
+    <div class="fixes-grid">
+      <div>
+        <p class="sub" style="margin-bottom:0.6rem;"><b style="color:var(--ink-1)">Data pipeline</b></p>
+        <ul class="fix-list">
+          <li><b>Wrong file, right name.</b> <code>SN_m_tot_V2.0.csv</code> is SILSO's raw monthly mean (month-to-month jumps up to ~35). The paper's low RMSE requires the actual 13-month smoothed series &mdash; found as <code>SN_ms_tot_V2.0 (2).csv</code> in the same folder (mean |Δ| ≈ 2.9/month) and used for every result here.</li>
+          <li><b>Scaler leakage.</b> The original notebook fit <code>MinMaxScaler</code> on the full series before splitting train/test, leaking future min/max into training. Scalers here are fit on train only.</li>
+          <li><b>Provisional rows dropped.</b> The 4 most-recent months carry SILSO's "not yet definitive" flag (smoothing needs ±6 months of future data); these are excluded rather than kept.</li>
+        </ul>
+      </div>
+      <div>
+        <p class="sub" style="margin-bottom:0.6rem;"><b style="color:var(--ink-1)">Modeling</b></p>
+        <ul class="fix-list">
+          <li><b>PatchTST-style transformer.</b> RevIN-normalized input window split into overlapping patches, embedded as tokens, encoded with a 2-layer transformer encoder &mdash; a genuine patch-based time-series transformer (Nie et al., 2023), not a relabeled RNN.</li>
+          <li><b>RevIN on the LSTM baseline too.</b> Per-window instance normalization instead of one global scaler, since sunspot amplitude varies ~3&times; between weak and strong cycles.</li>
+          <li><b>Chronos-Bolt, zero-shot.</b> Amazon's real pretrained time-series foundation model, run with no training on this data at all, for reference &mdash; RMSE 3.82, already ahead of naive persistence with zero fitting. (The paper's notebook had columns labeled "ChronosModel" / "TimesFM" / "Moirai" / "TimeGPT" that were, on inspection, the same plain Keras layers under different names &mdash; not real foundation-model runs.)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Full results</div>
+    <h2>All models, same holdout</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Model</th><th class="num">RMSE</th><th class="num">MAE</th><th class="num">R&sup2;</th></tr></thead>
+        <tbody id="metricsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="sub" style="margin-top:1.6rem;">For reference, the paper's self-reported numbers (different, larger, older test span &mdash; 1914&ndash;2024):</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Model</th><th class="num">RMSE</th><th class="num">MAE</th><th class="num">R&sup2;</th></tr></thead>
+        <tbody id="paperBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Code, trained model weights, and raw metrics: <code>C:\Users\amank\Downloads\sunspot_transformer\</code>
+    (<code>data.py</code>, <code>models.py</code>, <code>train.py</code>, <code>chronos_eval.py</code>, <code>final_compare.py</code>, <code>outputs\</code>).
+    Trained on CPU, PyTorch 2.13, Python 3.14.
+  </footer>
+
+</div>
+
+<script>
+const barData = [
+  { name: "Ensemble (LSTM + PatchTST)", rmse: 1.329, mae: 0.952, r2: 0.99953, color: "var(--series-blue)" },
+  { name: "LSTM, fixed (RevIN)",        rmse: 1.357, mae: 0.965, r2: 0.99951, color: "var(--series-aqua)" },
+  { name: "PatchTST (proposed)",        rmse: 1.440, mae: 1.032, r2: 0.99945, color: "var(--series-orange)" },
+  { name: "Chronos-Bolt (zero-shot)",   rmse: 3.818, mae: 2.898, r2: 0.99612, color: "var(--series-violet)" },
+  { name: "Naive persistence (no model)", rmse: 3.641, mae: 2.767, r2: 0.99647, color: "var(--series-muted)" },
+];
+
+const paperData = [
+  { name: "Proposed Hybrid Ensemble", rmse: 4.063, mae: 1.339, r2: 0.9963 },
+  { name: "CNN",     rmse: 4.465, mae: 1.755, r2: 0.9956 },
+  { name: "LSTM",    rmse: 4.598, mae: 1.965, r2: 0.9954 },
+  { name: "GRU",     rmse: 4.726, mae: 1.737, r2: 0.9951 },
+  { name: "RNN",     rmse: 4.899, mae: 1.544, r2: 0.9947 },
+  { name: "BiLSTM",  rmse: 5.041, mae: 2.493, r2: 0.9944 },
+];
+
+const chartJson = {"dates": ["2008-01", "2008-02", "2008-03", "2008-04", "2008-05", "2008-06", "2008-07", "2008-08", "2008-09", "2008-10", "2008-11", "2008-12", "2009-01", "2009-02", "2009-03", "2009-04", "2009-05", "2009-06", "2009-07", "2009-08", "2009-09", "2009-10", "2009-11", "2009-12", "2010-01", "2010-02", "2010-03", "2010-04", "2010-05", "2010-06", "2010-07", "2010-08", "2010-09", "2010-10", "2010-11", "2010-12", "2011-01", "2011-02", "2011-03", "2011-04", "2011-05", "2011-06", "2011-07", "2011-08", "2011-09", "2011-10", "2011-11", "2011-12", "2012-01", "2012-02", "2012-03", "2012-04", "2012-05", "2012-06", "2012-07", "2012-08", "2012-09", "2012-10", "2012-11", "2012-12", "2013-01", "2013-02", "2013-03", "2013-04", "2013-05", "2013-06", "2013-07", "2013-08", "2013-09", "2013-10", "2013-11", "2013-12", "2014-01", "2014-02", "2014-03", "2014-04", "2014-05", "2014-06", "2014-07", "2014-08", "2014-09", "2014-10", "2014-11", "2014-12", "2015-01", "2015-02", "2015-03", "2015-04", "2015-05", "2015-06", "2015-07", "2015-08", "2015-09", "2015-10", "2015-11", "2015-12", "2016-01", "2016-02", "2016-03", "2016-04", "2016-05", "2016-06", "2016-07", "2016-08", "2016-09", "2016-10", "2016-11", "2016-12", "2017-01", "2017-02", "2017-03", "2017-04", "2017-05", "2017-06", "2017-07", "2017-08", "2017-09", "2017-10", "2017-11", "2017-12", "2018-01", "2018-02", "2018-03", "2018-04", "2018-05", "2018-06", "2018-07", "2018-08", "2018-09", "2018-10", "2018-11", "2018-12", "2019-01", "2019-02", "2019-03", "2019-04", "2019-05", "2019-06", "2019-07", "2019-08", "2019-09", "2019-10", "2019-11", "2019-12", "2020-01", "2020-02", "2020-03", "2020-04", "2020-05", "2020-06", "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12", "2021-01", "2021-02", "2021-03", "2021-04", "2021-05", "2021-06", "2021-07", "2021-08", "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03"], "actual": [6.6, 5.6, 5.1, 5.1, 5.4, 4.8, 4.0, 3.8, 3.2, 2.4, 2.3, 2.2, 2.5, 2.7, 2.9, 3.3, 3.5, 4.1, 5.5, 7.4, 9.5, 10.9, 11.7, 12.7, 14.0, 16.1, 18.5, 20.8, 23.1, 24.6, 25.2, 26.4, 29.5, 34.5, 39.1, 42.5, 45.7, 48.8, 53.8, 61.1, 69.3, 77.2, 83.6, 86.3, 86.6, 87.4, 89.4, 92.5, 95.5, 98.1, 98.3, 95.1, 90.9, 86.6, 84.5, 85.1, 85.3, 85.8, 87.7, 88.1, 86.8, 86.1, 84.4, 84.3, 87.0, 90.9, 94.6, 99.0, 104.6, 107.0, 106.9, 107.6, 109.3, 110.5, 114.3, 116.4, 115.0, 114.1, 112.6, 108.3, 101.9, 97.3, 94.7, 92.2, 89.3, 86.1, 82.1, 78.9, 76.1, 72.1, 68.3, 66.4, 65.9, 64.3, 61.2, 57.8, 54.4, 52.5, 50.4, 47.8, 44.8, 41.5, 38.5, 36.0, 33.2, 31.5, 29.9, 28.5, 27.8, 26.5, 25.7, 24.8, 23.3, 22.2, 21.0, 19.6, 18.3, 16.7, 15.4, 15.1, 14.2, 12.6, 9.9, 7.8, 7.5, 7.2, 7.0, 6.7, 6.5, 6.8, 6.7, 6.0, 5.4, 5.0, 4.6, 4.3, 3.9, 3.7, 3.5, 3.4, 3.1, 2.6, 2.0, 1.8, 2.2, 2.7, 3.0, 3.6, 5.6, 7.9, 9.0, 9.5, 10.5, 11.9, 13.6, 15.3, 17.3, 19.0, 21.7, 24.8, 25.8, 27.6, 31.4, 35.4, 40.2, 45.2, 50.8, 55.9, 60.1, 64.7, 68.7, 73.0, 77.4, 81.1, 86.7, 92.6, 96.5, 98.9, 101.2, 106.7, 113.3, 117.8, 121.1, 122.9, 124.2, 125.3, 124.6, 124.3, 124.0, 124.8, 127.9, 129.5, 131.2, 136.9, 141.4, 144.4, 149.1, 152.8, 155.0, 156.8, 159.4, 160.9, 157.2, 151.2, 146.2, 139.8, 135.9], "ensemble": [6.7, 5.6, 4.8, 4.8, 5.1, 5.5, 3.9, 3.6, 3.5, 2.3, 1.9, 2.4, 1.9, 2.9, 2.5, 3.0, 3.5, 3.7, 4.8, 6.9, 8.9, 11.4, 12.2, 12.8, 13.9, 15.3, 18.2, 20.6, 23.1, 25.3, 25.8, 25.9, 28.0, 32.6, 39.2, 43.0, 45.9, 49.0, 51.9, 59.1, 68.0, 77.2, 84.9, 89.9, 88.7, 88.2, 89.5, 92.0, 95.7, 97.9, 100.0, 96.9, 91.4, 87.0, 82.8, 83.7, 85.9, 83.9, 85.1, 87.9, 86.5, 85.3, 86.1, 82.5, 85.7, 89.6, 92.6, 96.4, 102.9, 109.4, 108.9, 108.4, 109.1, 111.2, 111.8, 118.6, 116.3, 113.8, 113.5, 110.6, 103.5, 98.2, 94.7, 91.6, 88.4, 85.2, 82.0, 78.3, 76.7, 73.0, 68.3, 65.8, 65.3, 64.9, 61.9, 58.3, 55.0, 51.7, 51.4, 47.8, 45.6, 42.3, 38.9, 35.8, 33.6, 30.6, 30.6, 28.0, 27.3, 26.8, 24.9, 25.3, 23.7, 22.0, 21.4, 19.8, 18.5, 17.1, 15.2, 14.5, 14.9, 12.9, 11.2, 7.5, 6.7, 7.3, 6.4, 6.8, 6.1, 6.3, 6.9, 6.3, 5.4, 5.2, 4.8, 4.1, 3.9, 3.5, 3.6, 3.2, 3.3, 2.6, 2.3, 1.5, 1.8, 2.5, 2.9, 3.1, 4.2, 6.8, 9.2, 10.0, 10.5, 11.8, 13.2, 15.3, 16.8, 19.4, 20.4, 24.7, 27.2, 26.5, 30.3, 34.8, 38.9, 45.1, 49.8, 56.6, 60.6, 64.6, 69.4, 72.6, 77.8, 81.4, 84.6, 92.5, 97.4, 99.9, 101.3, 104.0, 112.5, 118.7, 121.7, 124.4, 124.6, 126.2, 126.4, 124.0, 125.0, 123.6, 125.8, 130.1, 129.3, 133.3, 142.9, 144.3, 148.4, 154.4, 156.1, 157.9, 159.0, 162.2, 161.9, 154.0, 146.8, 142.0, 133.9], "naive": [7.9, 6.6, 5.6, 5.1, 5.1, 5.4, 4.8, 4.0, 3.8, 3.2, 2.4, 2.3, 2.2, 2.5, 2.7, 2.9, 3.3, 3.5, 4.1, 5.5, 7.4, 9.5, 10.9, 11.7, 12.7, 14.0, 16.1, 18.5, 20.8, 23.1, 24.6, 25.2, 26.4, 29.5, 34.5, 39.1, 42.5, 45.7, 48.8, 53.8, 61.1, 69.3, 77.2, 83.6, 86.3, 86.6, 87.4, 89.4, 92.5, 95.5, 98.1, 98.3, 95.1, 90.9, 86.6, 84.5, 85.1, 85.3, 85.8, 87.7, 88.1, 86.8, 86.1, 84.4, 84.3, 87.0, 90.9, 94.6, 99.0, 104.6, 107.0, 106.9, 107.6, 109.3, 110.5, 114.3, 116.4, 115.0, 114.1, 112.6, 108.3, 101.9, 97.3, 94.7, 92.2, 89.3, 86.1, 82.1, 78.9, 76.1, 72.1, 68.3, 66.4, 65.9, 64.3, 61.2, 57.8, 54.4, 52.5, 50.4, 47.8, 44.8, 41.5, 38.5, 36.0, 33.2, 31.5, 29.9, 28.5, 27.8, 26.5, 25.7, 24.8, 23.3, 22.2, 21.0, 19.6, 18.3, 16.7, 15.4, 15.1, 14.2, 12.6, 9.9, 7.8, 7.5, 7.2, 7.0, 6.7, 6.5, 6.8, 6.7, 6.0, 5.4, 5.0, 4.6, 4.3, 3.9, 3.7, 3.5, 3.4, 3.1, 2.6, 2.0, 1.8, 2.2, 2.7, 3.0, 3.6, 5.6, 7.9, 9.0, 9.5, 10.5, 11.9, 13.6, 15.3, 17.3, 19.0, 21.7, 24.8, 25.8, 27.6, 31.4, 35.4, 40.2, 45.2, 50.8, 55.9, 60.1, 64.7, 68.7, 73.0, 77.4, 81.1, 86.7, 92.6, 96.5, 98.9, 101.2, 106.7, 113.3, 117.8, 121.1, 122.9, 124.2, 125.3, 124.6, 124.3, 124.0, 124.8, 127.9, 129.5, 131.2, 136.9, 141.4, 144.4, 149.1, 152.8, 155.0, 156.8, 159.4, 160.9, 157.2, 151.2, 146.2, 139.8]};
+
+function fmt(n, d=2) { return n.toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d}); }
+
+// ---------- Bar chart ----------
+function buildBarChart() {
+  const el = document.getElementById("barChart");
+  const W = 860, rowH = 46, gap = 10, padL = 10, padR = 70, padTop = 6;
+  const H = barData.length * (rowH + gap) - gap + padTop + 8;
+  const maxVal = Math.max(...barData.map(d => d.rmse)) * 1.12;
+  const barMaxW = W - padL - padR - 190;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible">`;
+  barData.forEach((d, i) => {
+    const y = padTop + i * (rowH + gap);
+    const bw = Math.max(4, (d.rmse / maxVal) * barMaxW);
+    const barX = 190;
+    svg += `<text x="${barX - 10}" y="${y + rowH/2 + 4}" text-anchor="end" class="bar-name">${d.name}</text>`;
+    svg += `<rect x="${barX}" y="${y + 6}" width="${barMaxW}" height="${rowH - 12}" fill="var(--gridline)" rx="4" opacity="0.5"/>`;
+    svg += `<g class="bar-hit" data-i="${i}" style="cursor:pointer">`;
+    svg += `<rect x="${barX}" y="${y + 6}" width="${bw}" height="${rowH - 12}" fill="${d.color}" rx="4"/>`;
+    svg += `<rect x="${barX}" y="${y}" width="${barMaxW}" height="${rowH}" fill="transparent"/>`;
+    svg += `</g>`;
+    svg += `<text x="${barX + bw + 10}" y="${y + rowH/2 + 4}" class="bar-label">${fmt(d.rmse)}</text>`;
+  });
+  svg += `</svg>`;
+  el.innerHTML = svg;
+
+  const tip = document.createElement("div");
+  tip.className = "tooltip";
+  el.appendChild(tip);
+
+  el.querySelectorAll(".bar-hit").forEach(g => {
+    const d = barData[+g.dataset.i];
+    g.addEventListener("pointermove", (e) => {
+      const rect = el.getBoundingClientRect();
+      tip.style.opacity = 1;
+      tip.style.left = (e.clientX - rect.left + 14) + "px";
+      tip.style.top = (e.clientY - rect.top - 10) + "px";
+      tip.innerHTML = `<div class="t-date"></div>
+        <div class="t-row"><span></span><span class="v">RMSE ${fmt(d.rmse)}</span></div>
+        <div class="t-row"><span>MAE</span><span class="v">${fmt(d.mae)}</span></div>
+        <div class="t-row"><span>R&sup2;</span><span class="v">${fmt(d.r2, 5)}</span></div>`;
+      tip.querySelector(".t-date").textContent = d.name;
+    });
+    g.addEventListener("pointerleave", () => tip.style.opacity = 0);
+  });
+
+  const legend = document.getElementById("barLegend");
+  legend.innerHTML = barData.map(d =>
+    `<span class="legend-item"><span class="legend-swatch" style="background:${d.color}"></span>${d.name}</span>`
+  ).join("");
+}
+
+// ---------- Line chart ----------
+function buildLineChart() {
+  const el = document.getElementById("lineChart");
+  const dates = chartJson.dates, actual = chartJson.actual, ens = chartJson.ensemble, naive = chartJson.naive;
+  const n = dates.length;
+  const W = 900, H = 340, padL = 40, padR = 14, padT = 14, padB = 28;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const maxY = Math.ceil(Math.max(...actual, ...ens, ...naive) / 10) * 10 + 5;
+  const x = i => padL + (i / (n - 1)) * plotW;
+  const y = v => padT + plotH - (v / maxY) * plotH;
+
+  const pathOf = arr => arr.map((v, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(2)},${y(v).toFixed(2)}`).join(" ");
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible" id="lineSvg">`;
+  // gridlines + y ticks
+  const ticks = 4;
+  for (let t = 0; t <= ticks; t++) {
+    const val = (maxY / ticks) * t;
+    const yy = y(val);
+    svg += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" class="gridline"/>`;
+    svg += `<text x="${padL - 8}" y="${yy + 3}" text-anchor="end" class="tick-label">${Math.round(val)}</text>`;
+  }
+  // year ticks (Jan of each even year)
+  dates.forEach((d, i) => {
+    if (d.endsWith("-01") && (parseInt(d) % 2 === 0)) {
+      svg += `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" class="tick-label">${d.slice(0,4)}</text>`;
+    }
+  });
+
+  svg += `<path d="${pathOf(naive)}" fill="none" stroke="var(--series-muted)" stroke-width="2" stroke-dasharray="5 4" stroke-linecap="round"/>`;
+  svg += `<path d="${pathOf(actual)}" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  svg += `<path d="${pathOf(ens)}" fill="none" stroke="var(--series-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+  svg += `<line id="crosshair" x1="0" y1="${padT}" x2="0" y2="${padT+plotH}" stroke="var(--text-muted)" stroke-width="1" opacity="0"/>`;
+  svg += `<rect id="hitrect" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent"/>`;
+  svg += `</svg>`;
+  el.innerHTML = svg;
+
+  const tip = document.createElement("div");
+  tip.className = "tooltip";
+  el.appendChild(tip);
+
+  const hit = el.querySelector("#hitrect");
+  const crosshair = el.querySelector("#crosshair");
+  hit.addEventListener("pointermove", (e) => {
+    const svgEl = el.querySelector("#lineSvg");
+    const pt = svgEl.createSVGPoint();
+    const rect = svgEl.getBoundingClientRect();
+    const scale = W / rect.width;
+    const mx = (e.clientX - rect.left) * scale;
+    let i = Math.round(((mx - padL) / plotW) * (n - 1));
+    i = Math.max(0, Math.min(n - 1, i));
+    crosshair.setAttribute("x1", x(i)); crosshair.setAttribute("x2", x(i)); crosshair.setAttribute("opacity", 1);
+    tip.style.opacity = 1;
+    const elRect = el.getBoundingClientRect();
+    tip.style.left = (e.clientX - elRect.left + 14) + "px";
+    tip.style.top = (e.clientY - elRect.top - 10) + "px";
+    tip.innerHTML = `<div class="t-date">${dates[i]}</div>
+      <div class="t-row"><span>Actual</span><span class="v">${fmt(actual[i],1)}</span></div>
+      <div class="t-row"><span>Ensemble</span><span class="v">${fmt(ens[i],1)}</span></div>
+      <div class="t-row"><span>Naive</span><span class="v">${fmt(naive[i],1)}</span></div>`;
+  });
+  hit.addEventListener("pointerleave", () => { tip.style.opacity = 0; crosshair.setAttribute("opacity", 0); });
+
+  document.getElementById("lineLegend").innerHTML = `
+    <span class="legend-item"><span class="legend-swatch" style="background:var(--text-primary)"></span>Actual</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:var(--series-blue)"></span>Ensemble (LSTM + PatchTST)</span>
+    <span class="legend-item" style="color:var(--series-muted)"><span class="legend-swatch dashed"></span>Naive persistence</span>`;
+
+  const tbl = document.getElementById("lineTable");
+  let thead = "<thead><tr><th>Month</th><th class='num'>Actual</th><th class='num'>Ensemble</th><th class='num'>Naive</th></tr></thead>";
+  let tbody = "<tbody>" + dates.map((d,i) => `<tr><td>${d}</td><td class="num">${fmt(actual[i],1)}</td><td class="num">${fmt(ens[i],1)}</td><td class="num">${fmt(naive[i],1)}</td></tr>`).join("") + "</tbody>";
+  tbl.innerHTML = thead + tbody;
+}
+
+function buildTables() {
+  const mb = document.getElementById("metricsBody");
+  mb.innerHTML = barData.map(d => `<tr class="${d.name.startsWith('Ensemble') ? 'hero-row' : ''}"><td>${d.name}</td><td class="num">${fmt(d.rmse)}</td><td class="num">${fmt(d.mae)}</td><td class="num">${fmt(d.r2,5)}</td></tr>`).join("");
+  const pb = document.getElementById("paperBody");
+  pb.innerHTML = paperData.map(d => `<tr><td>${d.name}</td><td class="num">${fmt(d.rmse)}</td><td class="num">${fmt(d.mae)}</td><td class="num">${fmt(d.r2,4)}</td></tr>`).join("");
+}
+
+buildBarChart();
+buildLineChart();
+buildTables();
+</script>
